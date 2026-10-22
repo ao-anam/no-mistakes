@@ -241,6 +241,7 @@ type ReviewBot struct {
 // bot is one entry here.
 var ReviewBots = []ReviewBot{
 	{AppSlug: "greptile-apps", Logins: []string{"greptile-apps[bot]", "greptile-apps"}, GitLabLogins: []string{"greptileai"}},
+	{AppSlug: "cubic-dev-ai", Logins: []string{"cubic-dev-ai[bot]", "cubic-dev-ai"}},
 }
 
 // ReviewBotForApp returns the registered review bot that publishes checks
