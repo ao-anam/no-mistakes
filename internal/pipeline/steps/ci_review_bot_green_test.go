@@ -340,10 +340,11 @@ func TestCIObservationFindings_GreenReviewBotCommentsFollowThePolicy(t *testing.
 // be posting, so only a completed check counts.
 func TestGreenReviewBotChecksExcludesPendingAndFailing(t *testing.T) {
 	t.Parallel()
-	got := greenReviewBotChecks([]scm.Check{
+	got := greenReviewBotChecks(scm.ReviewBotsFor([]string{"coderabbit"}), []scm.Check{
 		{Name: "Greptile pending", Bucket: scm.CheckBucketPending, App: "greptile-apps"},
 		{Name: "Greptile red", Bucket: scm.CheckBucketFail, App: "greptile-apps"},
 		{Name: "Greptile cancelled", Bucket: scm.CheckBucketCancel, App: "greptile-apps"},
+		{Name: "CodeRabbit pending", Bucket: scm.CheckBucketPending, App: "coderabbitai", AppID: scm.CodeRabbitAppID, AppHost: "github.com"},
 		{Name: "build", Bucket: scm.CheckBucketPass, App: "github-actions"},
 		{Name: "Greptile green", Bucket: scm.CheckBucketPass, App: "greptile-apps"},
 		{Name: "Greptile neutral", Bucket: scm.CheckBucketSkip, App: "greptile-apps"},
@@ -364,7 +365,8 @@ func TestGreenReviewBotChecksExcludesPendingAndFailing(t *testing.T) {
 // its earlier unresolved comments.
 func TestGreenReviewBotChecksIncludesEveryAbsentRegisteredBot(t *testing.T) {
 	t.Parallel()
-	got := greenReviewBotChecks([]scm.Check{
+	bots := scm.ReviewBotsFor(nil)
+	got := greenReviewBotChecks(bots, []scm.Check{
 		{Name: "build", Bucket: scm.CheckBucketPass, App: "github-actions"},
 	})
 	var slugs []string
@@ -375,7 +377,7 @@ func TestGreenReviewBotChecksIncludesEveryAbsentRegisteredBot(t *testing.T) {
 		slugs = append(slugs, check.bot.AppSlug)
 	}
 	var want []string
-	for _, bot := range scm.ReviewBots {
+	for _, bot := range bots {
 		want = append(want, bot.AppSlug)
 	}
 	if strings.Join(slugs, ",") != strings.Join(want, ",") {

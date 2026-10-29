@@ -18,7 +18,7 @@ func TestGetChecksCarriesCheckSuiteAppSlug(t *testing.T) {
 		"gh pr view 123 --repo test/repo --json headRefOid --jq .headRefOid": {stdout: "deadbeef\n"},
 		githubCommitChecksCommand("", "test/repo", "deadbeef"): {
 			stdout: githubCommitChecksResponse(`[
-				{"__typename":"CheckRun","databaseId":2,"name":"test","status":"COMPLETED","conclusion":"FAILURE","detailsUrl":"https://github.com/test/repo/actions/runs/1/job/2","checkSuite":{"app":{"slug":"github-actions"}}},
+				{"__typename":"CheckRun","databaseId":2,"name":"test","status":"COMPLETED","conclusion":"FAILURE","detailsUrl":"https://github.com/test/repo/actions/runs/1/job/2","checkSuite":{"app":{"slug":"github-actions","databaseId":15368}}},
 				{"__typename":"CheckRun","databaseId":3,"name":"Greptile Review","status":"COMPLETED","conclusion":"FAILURE","detailsUrl":"https://greptile.com/","checkSuite":{"app":{"slug":"greptile-apps"}}},
 				{"__typename":"CheckRun","databaseId":6,"name":"cubic","status":"COMPLETED","conclusion":"SUCCESS","detailsUrl":"https://cubic.dev/","checkSuite":{"app":{"slug":"cubic-dev-ai"}}},
 				{"__typename":"CheckRun","databaseId":4,"name":"orphan","status":"COMPLETED","conclusion":"SUCCESS"},
@@ -48,6 +48,9 @@ func TestGetChecksCarriesCheckSuiteAppSlug(t *testing.T) {
 		expected, ok := want[check.Name]
 		if !ok {
 			t.Fatalf("unexpected check %+v", check)
+		}
+		if check.Name == "test" && check.AppID != 15368 {
+			t.Fatalf("immutable app ID = %d", check.AppID)
 		}
 		if check.App != expected.app || check.ProviderID != expected.id {
 			t.Fatalf("check %q identity = (%q, %q), want (%q, %q)", check.Name, check.App, check.ProviderID, expected.app, expected.id)
